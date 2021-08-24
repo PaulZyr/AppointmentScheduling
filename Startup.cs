@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AppointmentScheduling.Models;
+using AppointmentScheduling.Services;
 using Microsoft.AspNetCore.Identity;
 
 namespace AppointmentScheduling
@@ -30,7 +31,7 @@ namespace AppointmentScheduling
             services.AddDbContext<AppDbContext>
                 (options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllersWithViews();
-
+            services.AddTransient<IAppointmentService, AppointmentService>();
             services.AddIdentity<AppUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>();
         }
@@ -53,6 +54,7 @@ namespace AppointmentScheduling
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
