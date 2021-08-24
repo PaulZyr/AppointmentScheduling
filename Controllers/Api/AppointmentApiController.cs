@@ -43,20 +43,52 @@ namespace AppointmentScheduling.Controllers.Api
             CommonResponse<int> commonResponse = new CommonResponse<int>();
             try
             {
-                commonResponse.Status = _appointmentService.AddUpdate(data).Result;
-                if (commonResponse.Status == 1)
+                commonResponse.status = _appointmentService.AddUpdate(data).Result;
+                if (commonResponse.status == 1)
                 {
-                    commonResponse.Message = Helper.appointmentUpdated;
+                    commonResponse.message = Helper.appointmentUpdated;
                 }
-                if (commonResponse.Status == 2)
+                if (commonResponse.status == 2)
                 {
-                    commonResponse.Message = Helper.appointmentAdded;
+                    commonResponse.message = Helper.appointmentAdded;
                 }
             }
             catch (Exception exception)
             {
-                commonResponse.Message = exception.Message;
-                commonResponse.Status = Helper.failure_code;
+                commonResponse.message = exception.Message;
+                commonResponse.status = Helper.failure_code;
+            }
+
+            return Ok(commonResponse);
+        }
+
+        [HttpGet]
+        [Route("GetCalendarData")]
+        public IActionResult GetCalendarData(string doctorId)
+        {
+            var commonResponse = new CommonResponse<List<AppointmentViewModel>>();
+            try
+            {
+                if (_role == Helper.Patient)
+                {
+                    commonResponse.dataEnum = _appointmentService.PatientsEventById(_loginUserId);
+                    commonResponse.status = Helper.success_code;
+                }
+                else if (_role == Helper.Doctor)
+                {
+                    commonResponse.dataEnum = _appointmentService.DoctorsEventById(_loginUserId);
+                    commonResponse.status = Helper.success_code;
+                }
+                else
+                {
+                    commonResponse.dataEnum = _appointmentService.DoctorsEventById(doctorId);
+                    commonResponse.status = Helper.success_code;
+                }
+            }
+            catch (Exception exception)
+            {
+                commonResponse.message = exception.Message;
+                commonResponse.status = Helper.failure_code;
             }
 
             return Ok(commonResponse);

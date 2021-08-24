@@ -57,10 +57,10 @@ function InitializeCalendar() {
                         success: function (response) {
                             var events = [];
                             if (response.status === 1) {
-                                $.each(response.dataenum, function (i, data) {
+                                $.each(response.dataEnum, function(i, data) {
                                     events.push({
                                         title: data.title,
-                                        desctiption: data.desctiption,
+                                        description: data.description,
                                         start: data.startDate,
                                         end: data.endDate,
                                         backgroundColor: data.isDoctorApproved ? "#28a745" : "#dc3545",
@@ -68,7 +68,7 @@ function InitializeCalendar() {
                                         textColor: "white",
                                         id: data.id
                                     });
-                                })
+                                });
                             }
                             successCallback(events);
                         },
