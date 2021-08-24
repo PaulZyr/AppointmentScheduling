@@ -23,12 +23,16 @@
                         <textarea type="text" class="form-control" id="description"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="title">Select Patient</label>
+                        <label for="patientId">Select Patient</label>
                         <select id="patientId" asp-items="@(new SelectList(ViewBag.PatientList, "Id", "Name"))" class="form-control"></select>
                     </div>
                     <div class="form-group">
-                        <label for="title">Duration</label>
+                        <label for="duration">Duration</label>
                         <select id="duration" asp-items="ViewBag.Duration" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="appointmentDate">Start Date Time</label>
+                        <input class="form-control" id="appointmentDate" />
                     </div>
                     <input type="hidden" id="id" />
                     @*@if (User.IsInRole(AppointmentScheduling.Utility.Helper.Admin))
@@ -63,15 +67,10 @@
                 </div>
             }
         }*@
-                    @*<div class="form-group">
-            <label for="description">Start Date Time</label>
-            <input class="form-control" id="appointmentDate" />
-        </div>
-                    *@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="onCloseModal();">Close</button> &nbsp;
-                    <button type="button" id="btnSubmit" class="btn btn-success d-none" onclick="onSubmitForm();">Submit</button>
+                    <button type="button" id="btnSubmit" class="btn btn-success" onclick="onSubmitForm();">Submit</button>
                     @*@if (User.IsInRole(AppointmentScheduling.Utility.Helper.Admin))
         {
             <button type="button" id="btnSubmit" class="btn btn-success d-none" onclick="onSubmitForm();">Submit</button>

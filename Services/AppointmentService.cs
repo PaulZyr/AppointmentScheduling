@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AppointmentScheduling.Data;
+using AppointmentScheduling.Models;
 using AppointmentScheduling.Utility;
 using Microsoft.AspNetCore.Identity;
 
@@ -41,6 +42,37 @@ namespace AppointmentScheduling.Services
                     Name = user.Name
                 }).ToList();
             return patients;
+        }
+
+        public async Task<int> AddUpdate(AppointmentViewModel model)
+        {
+            var startDate = DateTime.Parse(model.StartDate, System.Globalization.CultureInfo.InvariantCulture);
+            var endDate = DateTime.Parse(model.StartDate, System.Globalization.CultureInfo.InvariantCulture).AddMinutes(Convert.ToDouble(model.Duration));
+
+            if (model != null && model.Id > 0)
+            {
+                // update
+                return 1;
+            }
+            else
+            {
+                //create
+                var appointment = new Appointment()
+                {
+                    Title = model.Title,
+                    Description = model.Description,
+                    StartDate = startDate,
+                    EndDate = endDate,
+                    Duration = model.Duration,
+                    DoctorId = model.DoctorId,
+                    PatientId = model.PatientId,
+                    IsDoctorApproved = false,
+                    AdminId = model.AdminId
+                };
+                _db.Appointments.Add(appointment);
+                await _db.SaveChangesAsync();
+                return 2;
+            }
         }
     }
 }
