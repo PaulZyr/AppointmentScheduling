@@ -92,6 +92,10 @@ namespace AppointmentScheduling.Controllers
                     
                     return RedirectToAction("Index", "Appointment");
                 }
+                else
+                {
+                    TempData["newAdminSignUp"] = user.Name;
+                }
 
                 foreach (var error in result.Errors)
                 {

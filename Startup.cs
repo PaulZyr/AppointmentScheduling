@@ -8,7 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using AppointmentScheduling.Models;
 using AppointmentScheduling.Services;
+using AppointmentScheduling.Utility;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace AppointmentScheduling
 {
@@ -31,6 +33,7 @@ namespace AppointmentScheduling
             services.AddIdentity<AppUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>();
             services.AddDistributedMemoryCache();
+            services.AddScoped<IEmailSender, EmailSender>();
             services.AddSession(options =>
             {
                 options.IdleTimeout=TimeSpan.FromDays(10);

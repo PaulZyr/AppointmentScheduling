@@ -7,6 +7,7 @@ using AppointmentScheduling.Data;
 using AppointmentScheduling.Models;
 using AppointmentScheduling.Utility;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentScheduling.Services
@@ -14,10 +15,14 @@ namespace AppointmentScheduling.Services
     public class AppointmentService : IAppointmentService
     {
         private readonly AppDbContext _db;
+        private readonly IEmailSender _emailSender;
 
-        public AppointmentService(AppDbContext db)
+        public AppointmentService(
+            AppDbContext db, 
+            IEmailSender emailSender)
         {
             _db = db;
+            _emailSender = emailSender;
         }
         public List<DoctorViewModel> GetDoctorList()
         {
@@ -48,31 +53,64 @@ namespace AppointmentScheduling.Services
         public async Task<int> AddUpdate(AppointmentViewModel model)
         {
             var startDate = DateTime.Parse(model.StartDate, System.Globalization.CultureInfo.InvariantCulture);
-            var endDate = DateTime.Parse(model.StartDate, System.Globalization.CultureInfo.InvariantCulture).AddMinutes(Convert.ToDouble(model.Duration));
+            var endDate = DateTime.Parse(model.StartDate, System.Globalization.CultureInfo.InvariantCulture)
+                .AddMinutes(Convert.ToDouble(model.Duration));
+            var patient = _db.Users.FirstOrDefault(x => x.Id == model.PatientId);
+            var doctor = _db.Users.FirstOrDefault(x => x.Id == model.DoctorId);
 
-            if (model != null && model.Id > 0)
+            if (doctor != null && patient != null)
             {
-                // update
-                return 1;
+                if (model.Id > 0)
+                {
+                    // update
+                    var appointment = _db.Appointments.FirstOrDefault(x => x.Id == model.Id);
+                    if (appointment != null)
+                    {
+                        appointment.Title = model.Title;
+                        appointment.Description = model.Description;
+                        appointment.StartDate = startDate;
+                        appointment.EndDate = endDate;
+                        appointment.Duration = model.Duration;
+                        appointment.DoctorId = model.DoctorId;
+                        appointment.PatientId = model.PatientId;
+                        appointment.IsDoctorApproved = model.IsDoctorApproved;
+                        appointment.AdminId = model.AdminId;
+                    }
+
+                    await _db.SaveChangesAsync();
+                    return 1;
+                }
+                else
+                {
+                    //create
+                    var appointment = new Appointment()
+                    {
+                        Title = model.Title,
+                        Description = model.Description,
+                        StartDate = startDate,
+                        EndDate = endDate,
+                        Duration = model.Duration,
+                        DoctorId = model.DoctorId,
+                        PatientId = model.PatientId,
+                        IsDoctorApproved = false,
+                        AdminId = model.AdminId
+                    };
+                    await _emailSender.SendEmailAsync(
+                        doctor.Email,
+                        "Appointment created",
+                        $"You have a new appointment in pending status with {patient.Name}");
+                    await _emailSender.SendEmailAsync(
+                        patient.Email,
+                        "Appointment created",
+                        $"You have a new appointment in pending status with {doctor.Name}");
+                    _db.Appointments.Add(appointment);
+                    await _db.SaveChangesAsync();
+                    return 2;
+                }
             }
             else
             {
-                //create
-                var appointment = new Appointment()
-                {
-                    Title = model.Title,
-                    Description = model.Description,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                    Duration = model.Duration,
-                    DoctorId = model.DoctorId,
-                    PatientId = model.PatientId,
-                    IsDoctorApproved = false,
-                    AdminId = model.AdminId
-                };
-                _db.Appointments.Add(appointment);
-                await _db.SaveChangesAsync();
-                return 2;
+                return -1;
             }
         }
 
