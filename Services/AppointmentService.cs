@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 using AppointmentScheduling.Data;
 using AppointmentScheduling.Models;
 using AppointmentScheduling.Utility;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
 
 namespace AppointmentScheduling.Services
 {

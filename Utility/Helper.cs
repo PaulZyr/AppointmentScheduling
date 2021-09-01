@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AppointmentScheduling.Utility
 {
     public static class Helper
     {
-        public static string Admin = "Admin";
+        public const string Admin = "Admin";
         public static string Patient = "Patient";
         public static string Doctor = "Doctor";
 
