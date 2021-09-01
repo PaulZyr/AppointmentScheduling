@@ -7,6 +7,7 @@ using AppointmentScheduling.Data;
 using AppointmentScheduling.Models;
 using AppointmentScheduling.Models.ViewModels;
 using AppointmentScheduling.Utility;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
 namespace AppointmentScheduling.Controllers
@@ -44,6 +45,9 @@ namespace AppointmentScheduling.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
+                    var user = await _userManager.FindByNameAsync(model.Email);
+                    HttpContext.Session.SetString("ssuserName", user.Name);
+                    //var userName = HttpContext.Session.GetString("ssuserName");
                     return RedirectToAction("Index", "Appointment");
                 }
                 ModelState.AddModelError("", "Invalid login attempt");
@@ -81,8 +85,16 @@ namespace AppointmentScheduling.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, model.RoleName);
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    if (!User.IsInRole(Helper.Admin))
+                    {
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                    }
+                    
+                    return RedirectToAction("Index", "Appointment");
+                }
+                else
+                {
+                    TempData["newAdminSignUp"] = user.Name;
                 }
 
                 foreach (var error in result.Errors)
